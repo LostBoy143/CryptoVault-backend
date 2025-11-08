@@ -11,11 +11,29 @@ const app = express();
 // Parse incoming JSON
 app.use(express.json());
 
-// ✅ FIXED: Removed the extra `app.use(` line and closed parentheses properly
+// ✅ Allow only specific origins (Vercel + Localhost)
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://crypto-vault-frontend-pink.vercel.app",
+];
+
 app.use(
   cors({
-    origin:
-      process.env.CORS_ORIGIN?.split(",") || "*",
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        console.warn(
+          "Blocked CORS request from:",
+          origin
+        );
+        return callback(
+          new Error("Not allowed by CORS")
+        );
+      }
+    },
     credentials: true,
   })
 );
@@ -40,17 +58,17 @@ async function start() {
     await mongoose.connect(
       process.env.MONGODB_URI
     );
-    console.log("MongoDB connected");
+    console.log("✅ MongoDB connected");
 
     const port = process.env.PORT || 5000;
     app.listen(port, () =>
       console.log(
-        `Server running on http://localhost:${port}`
+        `🚀 Server running on http://localhost:${port}`
       )
     );
   } catch (err) {
     console.error(
-      "MongoDB connection error:",
+      "❌ MongoDB connection error:",
       err
     );
     process.exit(1);
