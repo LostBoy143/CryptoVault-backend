@@ -48,6 +48,11 @@ app.get("/health", (_req, res) => {
 });
 
 // API routes
+app.get("/", (req, res) => {
+  res.send(
+    "Welcome to CryptoVault Backend Server..."
+  );
+});
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/assets", assetRouter);
